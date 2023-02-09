@@ -1,29 +1,17 @@
+#!/usr/bin/node
+
 const request = require('request');
 
-function printCharacters(movieId) {
-  const endpoint = `https://swapi-api.alx-tools.com/api/films/${movieId}`;
-
-  request(endpoint, (error, response, body) => {
-    if (error) {
-      return console.error(error);
-    }
-
-    if (response.statusCode !== 200) {
-      return console.error(`Failed to retrieve film details with status code: ${response.statusCode}`);
-    }
-
-    const data = JSON.parse(body);
-    const characters = data.characters;
-
-    characters.forEach((characterUrl) => {
-      request(characterUrl, (error, response, body) => {
-        if (error) {
-          return console.error(error);
-        }
-
-        const characterData = JSON.parse(body);
-        console.log(characterData.name);
-      });
-    });
+request('https://swapi-api.hbtn.io/api/films/' + process.argv[2], function (err, res, body) {
+  if (err) throw err;
+  const actors = JSON.parse(body).characters;
+  exactOrder(actors, 0);
+});
+const exactOrder = (actors, x) => {
+  if (x === actors.length) return;
+  request(actors[x], function (err, res, body) {
+    if (err) throw err;
+    console.log(JSON.parse(body).name);
+    exactOrder(actors, x + 1);
   });
-}
+};
